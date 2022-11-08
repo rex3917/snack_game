@@ -23,8 +23,9 @@ unsigned char snake[50] = {77}; // snake star(4, 13)
 unsigned char food = 68;        // 初始位置(4, 4)
 int len = 1;					// 蛇長
 bool Alive = true;              // 是否活著
+int speed = 200;
 
-void print_game()
+void print_winner()
 {
 	for(int i = 0; i < MAPX; i ++){
 		for(int j = 0; j < MAPY; j++){
@@ -43,7 +44,29 @@ void print_game()
 		}
 		printf("\n");
 	}
-	Sleep(10);     // 延遲300毫秒
+}
+
+void print_game()
+{
+	
+	for(int i = 0; i < MAPX; i ++){
+		for(int j = 0; j < MAPY; j++){
+			if(map[i][j] == 0){
+				putchar(' ');
+			}
+			else if(map[i][j] == SNAKE){
+				putchar('o');
+			}
+			else if(map[i][j] == FOOD){
+				putchar('@');
+			}
+			else if(map[i][j] == WALL){
+				putchar('#');
+			}
+		}
+		printf("\n");
+	}
+	Sleep(speed);     // 延遲300毫秒
 	system("cls");  // 清除畫面 (刷新率)
 }
 
@@ -62,18 +85,19 @@ void print_game()
 
 unsigned char generate_food(){
 	unsigned char new_food, fx, fy;
-	bool in_snack = false;
+	bool in_snake = false;
 	srand((unsigned int)time(NULL));    //種子時間點
 	do{
+		in_snake = false;
 		new_food = (unsigned char)(rand()%255);  //亂數產生0~255
 		fx = new_food >> 4;
 		fy = new_food & 0x0F;
 		for (int i = 0;i < len; i++)
 			if(new_food == snake[i]){
-				in_snack = true;
+				in_snake = true;
 			}
 	}
-	while(fx == 0 || fx == MAPX-1 || fy == 0 || fy == MAPY-1 || in_snack);
+	while(fx == 0 || fx == MAPX-1 || fy == 0 || fy == MAPY-1 || in_snake);
 
 	return new_food;
 }
@@ -109,6 +133,7 @@ void move_snake(int dir)    	 	// 更改地圖物件
 	if (snake[0] == food)  		// 吃到food
 	{
 	    food = generate_food();
+		speed-=10;
 		snake[len] = last;
 		len++;
 	}
@@ -168,6 +193,7 @@ void game()
 {
 	len = 1;					// 蛇長
 	Alive = true;              // 是否活著
+	speed = 200;
 	unsigned char fx, fy, x, y;
 	do{
 		food = (unsigned char)(rand()%255);  //亂數產生0~255
@@ -199,20 +225,31 @@ void game()
 		print_game();
 		dir = get_dir(dir);
 		move_snake(dir);
-		if(!isAlive())
+		if(!isAlive()){
 			break;
+		}	
+		if(speed<=10){
+			break;
+		}
 	}
-	printf("Game Over!\n");
+	if(speed<=10){
+		print_winner();
+		printf("winner\n");
+	}
+	else{
+		printf("Game Over!\n");
+		}
+	
 }
 
 int main()
 {
 	int check;
-	printf("輸入 1 開始遊戲\n 輸入 0 結束遊戲");
+	printf("Enter '1' to start the game,'0' end game");
 	while(scanf("%d", &check) != EOF){
 		if(check == 1){
 			game();
-		printf("輸入 1 重新開始遊戲\n 輸入 0 結束遊戲");
+		printf("Enter ""1"" to start the game,""0"" end game");
 		}
 		if(check == 0){
 			break;

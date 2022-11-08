@@ -1,1 +1,1 @@
-"# snack_game" 
+Enter '1' to start the game,'0' end game
